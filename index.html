@@ -1,1 +1,86 @@
 
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pipa Battle</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#111;color:#fff;font-family:Arial,sans-serif}
+body{display:flex;justify-content:center;align-items:center;overflow:hidden}
+#game{position:relative;width:min(100vw,56.25vh);height:min(177.78vw,100vh);min-width:320px;min-height:568px;overflow:hidden;background:linear-gradient(#58bce8 0%,#b8e4f2 58%,#dbe8e8 100%)}
+.sun{position:absolute;right:9%;top:6%;width:70px;height:70px;border-radius:50%;background:#fff3ae;box-shadow:0 0 40px #fff0a0}
+.cloud{position:absolute;background:rgba(255,255,255,.72);border-radius:100px;filter:blur(1px)}
+.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%}
+.c1{width:130px;height:30px;top:17%;left:5%}.c1:before{width:55px;height:55px;left:18px;top:-28px}.c1:after{width:68px;height:68px;left:57px;top:-39px}
+.c2{width:100px;height:25px;top:30%;right:3%}.c2:before{width:42px;height:42px;left:10px;top:-22px}.c2:after{width:50px;height:50px;left:45px;top:-27px}
+#skyline{position:absolute;left:0;right:0;bottom:16%;height:30%;display:flex;align-items:flex-end}
+.building{position:relative;border-right:1px solid #344b56;background:linear-gradient(90deg,#3e5661,#8ca4ad 50%,#405762);overflow:hidden}
+.building:before{content:"";position:absolute;inset:7% 9%;background:
+repeating-linear-gradient(90deg,transparent 0 9px,rgba(220,237,239,.62) 9px 13px),
+repeating-linear-gradient(0deg,transparent 0 12px,rgba(220,237,239,.52) 12px 16px)}
+.b1{height:43%;width:14%}.b2{height:72%;width:17%;background:linear-gradient(90deg,#40535e,#a3b6bc,#415965)}
+.b3{height:55%;width:12%}.b4{height:88%;width:17%;background:linear-gradient(90deg,#394f5b,#9eb4bb,#405660)}
+.b5{height:49%;width:13%}.b6{height:66%;width:15%}.b7{height:38%;width:12%}
+#foreground{position:absolute;left:0;right:0;bottom:0;height:17%;background:linear-gradient(#425c66,#263b45)}
+#street{position:absolute;left:0;right:0;bottom:0;height:6%;background:#26353d}
+#lane{position:absolute;left:0;right:0;bottom:2.5%;height:2px;background:repeating-linear-gradient(90deg,#dfd29e 0 25px,transparent 25px 50px)}
+.tree{position:absolute;bottom:12%;width:9px;height:48px;background:#39483e;z-index:3}
+.tree:before{content:"";position:absolute;width:55px;height:55px;left:-23px;top:-40px;border-radius:50%;background:#315746;box-shadow:17px 4px #3d6650,-13px 8px #294c3e}
+#hud{position:absolute;z-index:50;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;gap:8px}
+.badge{background:rgba(255,255,255,.84);color:#17303c;padding:7px 9px;border-radius:10px;font-size:12px;font-weight:700;backdrop-filter:blur(5px)}
+.kite{position:absolute;width:72px;height:72px;z-index:20;transition:transform .15s;filter:drop-shadow(0 5px 4px rgba(0,0,0,.25))}
+.diamond{position:absolute;inset:5px;border-radius:8px 18px 8px 18px;transform:rotate(45deg);background:linear-gradient(135deg,var(--a),#fff 46%,var(--b));border:2px solid rgba(25,30,35,.6)}
+.spine{position:absolute;left:50%;top:2px;width:2px;height:72px;background:rgba(20,30,35,.6)}
+.cross{position:absolute;left:9px;right:9px;top:50%;height:2px;background:rgba(20,30,35,.45)}
+.tail{position:absolute;left:34px;top:58px;width:3px;height:155px;background:var(--a);transform:rotate(-7deg);transform-origin:top}
+.bow{position:absolute;width:25px;height:11px;border-bottom:3px solid var(--b);border-radius:50%;left:-1px;top:74px;transform:rotate(8deg)}
+.bow2{position:absolute;width:23px;height:11px;border-bottom:3px solid var(--b);border-radius:50%;left:17px;top:112px;transform:rotate(-8deg)}
+.line{position:absolute;left:35px;top:57px;width:1px;height:520px;background:rgba(25,35,40,.35);transform:rotate(7deg);transform-origin:top}
+.tag{position:absolute;top:-25px;left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(255,255,255,.9);color:#172a33;padding:3px 7px;border-radius:7px;font-size:10px;font-weight:800}
+#help{position:absolute;z-index:60;bottom:9px;left:9px;right:9px;background:rgba(20,35,43,.72);padding:8px;border-radius:9px;text-align:center;font-size:11px}
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div>
+  <div id="skyline">
+    <div class="building b1"></div><div class="building b2"></div><div class="building b3"></div>
+    <div class="building b4"></div><div class="building b5"></div><div class="building b6"></div><div class="building b7"></div>
+  </div>
+  <div class="tree" style="left:8%"></div><div class="tree" style="left:28%;transform:scale(.8)"></div><div class="tree" style="right:17%;transform:scale(.9)"></div>
+  <div id="foreground"></div><div id="street"></div><div id="lane"></div>
+  <div id="hud"><span class="badge" id="count">0 pipas</span><span class="badge" id="wind">🌬️ vento normal</span></div>
+  <div id="help">🌹 Rose = criar pipa • Esta versão já está pronta para publicar</div>
+</div>
+<script>
+(function(){
+ const game=document.getElementById('game'),count=document.getElementById('count'),windText=document.getElementById('wind');
+ const players=[];let wind=0,id=0;
+ const colors=[['#e63963','#ffd166'],['#08a878','#118ab2'],['#7546d8','#ffbe0b'],['#ef6c36','#ffd166'],['#3184d9','#f05b8f']];
+ function update(){count.textContent=players.length+' pipa'+(players.length===1?'':'s')}
+ window.criarPipa=function(nome){
+   nome=(nome||'Jogador '+(players.length+1)).trim();
+   if(players.some(p=>p.nome.toLowerCase()===nome.toLowerCase()))return;
+   const c=colors[id++%colors.length],p={nome:nome,x:10+Math.random()*76,y:16+Math.random()*38,phase:Math.random()*10};
+   const k=document.createElement('div');k.className='kite';k.style.setProperty('--a',c[0]);k.style.setProperty('--b',c[1]);
+   k.innerHTML='<div class="diamond"></div><div class="spine"></div><div class="cross"></div><div class="tail"></div><div class="bow"></div><div class="bow2"></div><div class="line"></div><div class="tag"></div>';
+   k.querySelector('.tag').textContent=nome;game.appendChild(k);p.el=k;players.push(p);update();
+ };
+ window.removerPipas=function(){players.splice(0).forEach(p=>p.el.remove());id=0;update()};
+ function animate(t){
+   players.forEach(p=>{
+     p.x+=Math.sin(t/1800+p.phase)*.012+wind*.018;
+     p.y+=Math.sin(t/1300+p.phase)*.009;
+     if(p.x>87)p.x=7;if(p.x<6)p.x=87;p.y=Math.max(10,Math.min(56,p.y));
+     p.el.style.left=p.x+'%';p.el.style.top=p.y+'%';
+     p.el.style.transform='rotate('+Math.sin(t/480+p.phase)*3+'deg)';
+   });
+   requestAnimationFrame(animate);
+ }
+ requestAnimationFrame(animate);
+ window.setVento=function(valor){wind=Number(valor)||0;windText.textContent=wind===0?'🌬️ vento normal':wind>0?'🌬️ vento forte →':'🌬️ vento forte ←'};
+})();
+</script>
+</body>
+</html>
